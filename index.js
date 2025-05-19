@@ -159,7 +159,7 @@ app.post('/fetch', async (req, res) => {
           console.log('Saved to database');
           res.json({
             success: true,
-            message: `10-Q filing for ${symbol} downloaded and saved.`,
+            message: `Quarterly filing for ${symbol} retrieved.`,
             url: filingUrl,
             filingDate,
             filingPrice,
