@@ -40,9 +40,14 @@
       border-radius: 4px;
       cursor: pointer;
       font-size: 16px;
+      margin: 5px;
     }
     button:hover {
       background-color: #0052a3;
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
     }
     #result {
       margin-top: 20px;
@@ -58,6 +63,20 @@
       background-color: #ffe6e6;
       border: 1px solid #cc0000;
     }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    #analysis {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 4px;
+      display: none;
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
@@ -65,15 +84,20 @@
     <h1>Financial Data Downloader</h1>
     <div class="input-group">
       <input type="text" id="symbol" placeholder="Enter stock symbol (e.g., AAPL)" required>
-      <button onclick="fetchData()">Download Latest Quarterly Report</button>
+      <div class="button-group">
+        <button onclick="fetchData()">Download Latest Quarterly Report</button>
+        <button onclick="analyzeData()" id="analyzeBtn" disabled>Analyze Financials</button>
+      </div>
     </div>
     <div id="result"></div>
+    <div id="analysis"></div>
   </div>
 
   <script>
     async function fetchData() {
       const symbol = document.getElementById('symbol').value.toUpperCase();
       const resultDiv = document.getElementById('result');
+      const analyzeBtn = document.getElementById('analyzeBtn');
       
       if (!symbol) {
         showResult('Please enter a stock symbol', 'error');
@@ -89,10 +113,51 @@
           body: JSON.stringify({ symbol: symbol })
         });
 
-        const data = await response.text();
-        showResult(data, response.ok ? 'success' : 'error');
+        const data = await response.json();
+        showResult(data.message, response.ok ? 'success' : 'error');
+        
+        if (response.ok) {
+          analyzeBtn.disabled = false;
+        }
       } catch (error) {
         showResult('Error: ' + error.message, 'error');
+      }
+    }
+
+    async function analyzeData() {
+      const symbol = document.getElementById('symbol').value.toUpperCase();
+      const analysisDiv = document.getElementById('analysis');
+      const analyzeBtn = document.getElementById('analyzeBtn');
+      
+      if (!symbol) {
+        showResult('Please enter a stock symbol', 'error');
+        return;
+      }
+
+      analyzeBtn.disabled = true;
+      analysisDiv.style.display = 'block';
+      analysisDiv.innerHTML = 'Analyzing financial data...';
+
+      try {
+        const response = await fetch('/analyze', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ symbol: symbol })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+          analysisDiv.innerHTML = data.analysis;
+        } else {
+          analysisDiv.innerHTML = `Error: ${data.error}`;
+        }
+      } catch (error) {
+        analysisDiv.innerHTML = `Error: ${error.message}`;
+      } finally {
+        analyzeBtn.disabled = false;
       }
     }
 
