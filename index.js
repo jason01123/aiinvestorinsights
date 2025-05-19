@@ -149,6 +149,7 @@ app.post('/fetch', async (req, res) => {
       currentPrice = price;
     }
 
+    // Save to database
     db.run(
       'INSERT INTO financials (symbol, date, content) VALUES (?, ?, ?)',
       [symbol, new Date().toISOString(), filingContent],
@@ -158,14 +159,18 @@ app.post('/fetch', async (req, res) => {
           res.status(500).json({ error: 'Error saving financial data' });
         } else {
           console.log('Saved to database');
+          const companyName = response.data.name;
+
           res.json({
             success: true,
-            message: `Quarterly filing for ${symbol} retrieved.`,
+            message: `Quarterly filing for ${companyName} (${symbol}) retrieved.`,
+            company: companyName,
             url: filingUrl,
             filingDate,
             filingPrice,
             currentPrice
           });
+          
         }
       }
     );

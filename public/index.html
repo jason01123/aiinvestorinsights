@@ -28,6 +28,7 @@
       margin-bottom: 30px;
       font-size: 1.2em;
       font-weight: normal;
+      text-transform: uppercase;
     }
     .input-group {
       display: flex;
@@ -141,11 +142,17 @@
       const resultDiv = document.getElementById('result');
       const priceInfoDiv = document.getElementById('priceInfo');
       const analyzeBtn = document.getElementById('analyzeBtn');
+      const analysisDiv = document.getElementById('analysis');
       
       if (!symbol) {
         showResult('Please enter a stock symbol', 'error');
         return;
       }
+
+      // Clear previous analysis
+      analysisDiv.style.display = 'none';
+      analysisDiv.innerHTML = '';
+      analyzeBtn.disabled = true;
 
       try {
         const response = await fetch('/fetch', {
