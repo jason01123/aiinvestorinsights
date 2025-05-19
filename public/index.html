@@ -10,6 +10,36 @@
       padding: 20px;
       background-color: #f5f5f5;
     }
+    .hero {
+      background-color: #0066cc;
+      color: white;
+      padding: 20px;
+      margin: -20px -20px 20px -20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .hero h1 {
+      margin: 0;
+      font-size: 24px;
+      color: white;
+    }
+    .auth-links {
+      display: flex;
+      gap: 15px;
+    }
+    .auth-links a {
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      border: 1px solid white;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .auth-links a:hover {
+      background-color: white;
+      color: #0066cc;
+    }
     .container {
       background-color: white;
       padding: 30px;
@@ -118,6 +148,13 @@
   </style>
 </head>
 <body>
+  <div class="hero">
+    <h1>AI Investor Insights</h1>
+    <div class="auth-links">
+      <a href="#">Login</a>
+      <a href="#">Sign Up</a>
+    </div>
+  </div>
   <div class="container">
     <h1>BUY / SELL / HOLD</h1>
     <h2>AI analysis of latest quarterly filing</h2>
