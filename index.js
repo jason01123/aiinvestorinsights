@@ -88,7 +88,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Fetch latest 10-Q using Submissions API
+// Fetch 10-Q + Stock Prices
 app.post('/fetch', async (req, res) => {
   if (!req.body || !req.body.symbol) {
     return res.status(400).json({ error: 'Stock symbol is required' });
@@ -119,6 +119,7 @@ app.post('/fetch', async (req, res) => {
     const accessionRaw = filings.accessionNumber[index];
     const accessionClean = accessionRaw.replace(/-/g, '');
     const primaryDoc = filings.primaryDocument[index];
+    const filingDate = filings.filingDate[index];
 
     const filingUrl = `https://www.sec.gov/Archives/edgar/data/${parseInt(cik)}/${accessionClean}/${primaryDoc}`;
     console.log(`Fetching 10-Q for ${symbol}: ${filingUrl}`);
@@ -126,6 +127,27 @@ app.post('/fetch', async (req, res) => {
     const finalDoc = await axios.get(filingUrl, { headers });
     const filingContent = finalDoc.data;
 
+    // Fetch stock prices using Yahoo Finance
+    const priceUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=5y`;
+    const stockResp = await axios.get(priceUrl);
+    const result = stockResp.data.chart.result[0];
+    const timestamps = result.timestamp;
+    const prices = result.indicators.adjclose[0].adjclose;
+
+    const filingTimestamp = Math.floor(new Date(filingDate).getTime() / 1000);
+    let filingPrice = null;
+    let currentPrice = null;
+
+    for (let i = 0; i < timestamps.length; i++) {
+      const ts = timestamps[i];
+      const price = prices[i];
+      if (!filingPrice && ts >= filingTimestamp) {
+        filingPrice = price;
+      }
+      currentPrice = price;
+    }
+
+    // Save to database
     db.run(
       'INSERT INTO financials (symbol, date, content) VALUES (?, ?, ?)',
       [symbol, new Date().toISOString(), filingContent],
@@ -138,7 +160,10 @@ app.post('/fetch', async (req, res) => {
           res.json({
             success: true,
             message: `10-Q filing for ${symbol} downloaded and saved.`,
-            url: filingUrl
+            url: filingUrl,
+            filingDate,
+            filingPrice,
+            currentPrice
           });
         }
       }
@@ -151,7 +176,7 @@ app.post('/fetch', async (req, res) => {
   }
 });
 
-// Analyze route using cheerio to extract structured content
+// Analyze financials
 app.post('/analyze', async (req, res) => {
   if (!req.body || !req.body.symbol) {
     return res.status(400).json({ error: 'Stock symbol is required' });
@@ -177,14 +202,14 @@ app.post('/analyze', async (req, res) => {
         $('p').each((_, el) => content += $(el).text() + '\n');
         $('table').each((_, el) => content += $(el).text() + '\n');
 
-        const input = content.slice(0, 12000); // Limit input for token safety
+        const input = content.slice(0, 12000); // limit to avoid token overflow
 
         const completion = await openai.chat.completions.create({
           model: "gpt-4-turbo-preview",
           messages: [
             {
               role: "system",
-              content: "You are a financial analyst. Analyze this 10-Q or 10-K and summarize the company's financial health, key metrics, risks, and opportunities."
+              content: "You are a financial analyst. Analyze this 10-Q or 10-K and summarize the company's financial health in one paragraph and give a buy, sell, or hold recommendation."
             },
             {
               role: "user",

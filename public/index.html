@@ -77,6 +77,26 @@
       border: 1px solid #dee2e6;
       white-space: pre-wrap;
     }
+    .price-info {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #f0f8ff;
+      border-radius: 4px;
+      border: 1px solid #b0c4de;
+    }
+    .price-info p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+    .price-change {
+      font-weight: bold;
+    }
+    .price-up {
+      color: #008000;
+    }
+    .price-down {
+      color: #cc0000;
+    }
   </style>
 </head>
 <body>
@@ -90,6 +110,7 @@
       </div>
     </div>
     <div id="result"></div>
+    <div id="priceInfo" class="price-info" style="display: none;"></div>
     <div id="analysis"></div>
   </div>
 
@@ -97,6 +118,7 @@
     async function fetchData() {
       const symbol = document.getElementById('symbol').value.toUpperCase();
       const resultDiv = document.getElementById('result');
+      const priceInfoDiv = document.getElementById('priceInfo');
       const analyzeBtn = document.getElementById('analyzeBtn');
       
       if (!symbol) {
@@ -118,6 +140,22 @@
         
         if (response.ok) {
           analyzeBtn.disabled = false;
+          // Display price information
+          if (data.filingPrice && data.currentPrice) {
+            const priceChange = ((data.currentPrice - data.filingPrice) / data.filingPrice * 100).toFixed(2);
+            const priceChangeClass = priceChange >= 0 ? 'price-up' : 'price-down';
+            const priceChangeSymbol = priceChange >= 0 ? '↑' : '↓';
+            
+            priceInfoDiv.innerHTML = `
+              <p>Filing Date: ${new Date(data.filingDate).toLocaleDateString()}</p>
+              <p>Price at Filing: $${data.filingPrice.toFixed(2)}</p>
+              <p>Current Price: $${data.currentPrice.toFixed(2)}</p>
+              <p class="price-change ${priceChangeClass}">
+                Change: ${priceChangeSymbol} ${Math.abs(priceChange)}%
+              </p>
+            `;
+            priceInfoDiv.style.display = 'block';
+          }
         }
       } catch (error) {
         showResult('Error: ' + error.message, 'error');
