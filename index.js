@@ -91,13 +91,15 @@ app.get('/', (req, res) => {
 // Fetch 10-Q + Stock Prices
 app.post('/fetch', async (req, res) => {
   if (!req.body || !req.body.symbol) {
-    return res.status(400).json({ error: 'Stock symbol is required' });
+    return res.status(400).json({ error: 'Please enter a stock symbol' });
   }
 
   const symbol = req.body.symbol.toUpperCase();
   const cik = SYMBOL_TO_CIK[symbol];
   if (!cik) {
-    return res.status(400).json({ error: 'Invalid stock symbol or CIK not found' });
+    return res.status(400).json({ 
+      error: `"${symbol}" is not a valid stock symbol. Please check the symbol and try again. Common examples: AAPL, MSFT, GOOGL, AMZN`
+    });
   }
 
   const headers = {
@@ -147,7 +149,6 @@ app.post('/fetch', async (req, res) => {
       currentPrice = price;
     }
 
-    // Save to database
     db.run(
       'INSERT INTO financials (symbol, date, content) VALUES (?, ?, ?)',
       [symbol, new Date().toISOString(), filingContent],
@@ -159,7 +160,7 @@ app.post('/fetch', async (req, res) => {
           console.log('Saved to database');
           res.json({
             success: true,
-            message: `Quarterly filing for ${symbol} retrieved.`,
+            message: `10-Q filing for ${symbol} downloaded and saved.`,
             url: filingUrl,
             filingDate,
             filingPrice,

@@ -157,9 +157,9 @@
         });
 
         const data = await response.json();
-        showResult(data.message, response.ok ? 'success' : 'error');
         
         if (response.ok) {
+          showResult(data.message, 'success');
           analyzeBtn.disabled = false;
           // Display price information
           if (data.filingPrice && data.currentPrice) {
@@ -177,9 +177,15 @@
             `;
             priceInfoDiv.style.display = 'block';
           }
+        } else {
+          showResult(data.error || 'An error occurred', 'error');
+          analyzeBtn.disabled = true;
+          priceInfoDiv.style.display = 'none';
         }
       } catch (error) {
         showResult('Error: ' + error.message, 'error');
+        analyzeBtn.disabled = true;
+        priceInfoDiv.style.display = 'none';
       }
     }
 
