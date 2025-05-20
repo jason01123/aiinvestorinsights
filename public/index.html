@@ -22,22 +22,21 @@
       <div class="input-group">
         <input type="text" id="symbol" placeholder="Enter stock symbol (e.g., AAPL)" required>
         <div class="button-group">
-          <button onclick="fetchData()">Download Latest Quarterly Report</button>
-          <button onclick="analyzeData()" id="analyzeBtn" disabled>Analyze Financials</button>
+          <button onclick="fetchAndAnalyze()" id="analyzeBtn">Analyze Financials</button>
         </div>
       </div>
       <div id="result"></div>
       <div id="priceInfo" class="price-info" style="display: none;"></div>
       <div id="analysis"></div>
       <div class="disclaimer">
-        The insights and recommendations provided on this page are generated using AI and are intended for informational purposes only. They do not constitute financial advice. Always conduct your own research or consult with a licensed financial advisor before making investment decisions. Use at your own discretion and risk.
+        The information provided on this page are generated using AI and are intended for informational purposes only. They do not constitute financial advice.
       </div>
     </div>
   </div>
 
   <footer class="footer">
     <div class="footer-content">
-      <p>© 2024 AI Investor Insights. All rights reserved.</p>
+      <p>© 2025 AI Investor Insights. All rights reserved.</p>
       <p>
         <a href="#">Privacy Policy</a> | 
         <a href="#">Terms of Service</a> | 
@@ -47,98 +46,75 @@
   </footer>
 
   <script>
-    async function fetchData() {
+    async function fetchAndAnalyze() {
       const symbol = document.getElementById('symbol').value.toUpperCase();
       const resultDiv = document.getElementById('result');
       const priceInfoDiv = document.getElementById('priceInfo');
       const analyzeBtn = document.getElementById('analyzeBtn');
       const analysisDiv = document.getElementById('analysis');
-      
+
       if (!symbol) {
         showResult('Please enter a stock symbol', 'error');
         return;
       }
 
-      // Clear previous analysis
-      analysisDiv.style.display = 'none';
-      analysisDiv.innerHTML = '';
-      analyzeBtn.disabled = true;
-
-      try {
-        const response = await fetch('/fetch', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ symbol: symbol })
-        });
-
-        const data = await response.json();
-        
-        if (response.ok) {
-          showResult(data.message, 'success');
-          analyzeBtn.disabled = false;
-          // Display price information
-          if (data.filingPrice && data.currentPrice) {
-            const priceChange = ((data.currentPrice - data.filingPrice) / data.filingPrice * 100).toFixed(2);
-            const priceChangeClass = priceChange >= 0 ? 'price-up' : 'price-down';
-            const priceChangeSymbol = priceChange >= 0 ? '↑' : '↓';
-            
-            priceInfoDiv.innerHTML = `
-              <p>Filing Date: ${new Date(data.filingDate).toLocaleDateString()}</p>
-              <p>Price at Filing: $${data.filingPrice.toFixed(2)}</p>
-              <p>Current Price: $${data.currentPrice.toFixed(2)}</p>
-              <p class="price-change ${priceChangeClass}">
-                Change: ${priceChangeSymbol} ${Math.abs(priceChange)}%
-              </p>
-            `;
-            priceInfoDiv.style.display = 'block';
-          }
-        } else {
-          showResult(data.error || 'An error occurred', 'error');
-          analyzeBtn.disabled = true;
-          priceInfoDiv.style.display = 'none';
-        }
-      } catch (error) {
-        showResult('Error: ' + error.message, 'error');
-        analyzeBtn.disabled = true;
-        priceInfoDiv.style.display = 'none';
-      }
-    }
-
-    async function analyzeData() {
-      const symbol = document.getElementById('symbol').value.toUpperCase();
-      const analysisDiv = document.getElementById('analysis');
-      const analyzeBtn = document.getElementById('analyzeBtn');
-      
-      if (!symbol) {
-        showResult('Please enter a stock symbol', 'error');
-        return;
-      }
-
-      analyzeBtn.disabled = true;
+      resultDiv.innerHTML = '';
+      priceInfoDiv.style.display = 'none';
       analysisDiv.style.display = 'block';
-      analysisDiv.innerHTML = 'Analyzing financial data...';
+      analysisDiv.innerHTML = 'Fetching financial data...';
+      analyzeBtn.disabled = true;
 
       try {
-        const response = await fetch('/analyze', {
+        // Step 1: Fetch latest 10-Q + price info
+        const fetchResponse = await fetch('/fetch', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ symbol: symbol })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ symbol })
         });
 
-        const data = await response.json();
-        
-        if (response.ok) {
-          const filingDate = document.querySelector('#priceInfo p:first-child').textContent.split(': ')[1];
-          analysisDiv.innerHTML = `<h3>Financial analysis based on last quarterly report filed on ${filingDate}</h3>${data.analysis}`;
-        } else {
-          analysisDiv.innerHTML = `Error: ${data.error}`;
+        const fetchData = await fetchResponse.json();
+        if (!fetchResponse.ok) {
+          throw new Error(fetchData.error || 'Failed to fetch financials.');
         }
-      } catch (error) {
-        analysisDiv.innerHTML = `Error: ${error.message}`;
+
+        showResult(fetchData.message, 'success');
+
+        if (fetchData.filingPrice && fetchData.currentPrice) {
+          const priceChange = ((fetchData.currentPrice - fetchData.filingPrice) / fetchData.filingPrice * 100).toFixed(2);
+          const priceChangeClass = priceChange >= 0 ? 'price-up' : 'price-down';
+          const priceChangeSymbol = priceChange >= 0 ? '↑' : '↓';
+
+          priceInfoDiv.innerHTML = `
+            <p>Filing Date: ${new Date(fetchData.filingDate).toLocaleDateString()}</p>
+            <p>Price at Filing: $${fetchData.filingPrice.toFixed(2)}</p>
+            <p>Current Price: $${fetchData.currentPrice.toFixed(2)}</p>
+            <p class="price-change ${priceChangeClass}">
+              Change: ${priceChangeSymbol} ${Math.abs(priceChange)}%
+            </p>
+          `;
+          priceInfoDiv.style.display = 'block';
+        }
+
+        // Step 2: Analyze
+        analysisDiv.innerHTML = 'Analyzing financial data...';
+
+        const analyzeResponse = await fetch('/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ symbol })
+        });
+
+        const analyzeData = await analyzeResponse.json();
+        if (!analyzeResponse.ok) {
+          throw new Error(analyzeData.error || 'Failed to analyze.');
+        }
+
+        const filingDate = fetchData.filingDate;
+        analysisDiv.innerHTML = `<h3>Financial analysis based on last quarterly report filed on ${new Date(filingDate).toLocaleDateString()}</h3>${analyzeData.analysis}`;
+      } catch (err) {
+        showResult(err.message, 'error');
+        analysisDiv.innerHTML = '';
+        priceInfoDiv.style.display = 'none';
       } finally {
         analyzeBtn.disabled = false;
       }
