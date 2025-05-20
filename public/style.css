@@ -2,10 +2,298 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: sans-serif;
-  margin: 40px;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
-textarea {
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.hero {
+  background-color: #0066cc;
+  color: white;
+  padding: 20px 0;
   width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-content {
+  max-width: 800px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: 24px;
+  color: white;
+}
+
+.auth-links {
+  display: flex;
+  gap: 15px;
+}
+
+.auth-links a {
+  color: white;
+  text-decoration: none;
+  padding: 8px 16px;
+  border: 1px solid white;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.auth-links a:hover {
+  background-color: white;
+  color: #0066cc;
+}
+
+.main-content {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 0 20px;
+  flex: 1;
+  width: 100%;
+}
+
+.container {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+h1 {
+  color: #333;
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: clamp(24px, 5vw, 32px);
+}
+
+h2 {
+  color: #666;
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 30px;
+  font-size: clamp(14px, 3vw, 18px);
+  font-weight: normal;
+  text-transform: uppercase;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+input[type="text"] {
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+}
+
+button {
+  padding: 12px 24px;
+  background-color: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 5px;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #0052a3;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+#result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 4px;
+  display: none;
+}
+
+.success {
+  background-color: #e6ffe6;
+  border: 1px solid #00cc00;
+}
+
+.error {
+  background-color: #ffe6e6;
+  border: 1px solid #cc0000;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+#analysis {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 4px;
+  display: none;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+.price-info {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f0f8ff;
+  border-radius: 4px;
+  border: 1px solid #b0c4de;
+}
+
+.price-info p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.price-change {
+  font-weight: bold;
+}
+
+.price-up {
+  color: #008000;
+}
+
+.price-down {
+  color: #cc0000;
+}
+
+.disclaimer {
+  margin-top: 40px;
+  padding: 15px;
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+  border-top: 1px solid #ddd;
+  line-height: 1.4;
+}
+
+.footer {
+  background-color: #0066cc;
+  color: white;
+  padding: 20px 0;
+  text-align: center;
+  margin-top: auto;
+  width: 100%;
+}
+
+.footer-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.footer p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.footer a {
+  color: white;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+/* Media Queries */
+@media screen and (max-width: 768px) {
+  .hero-content {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .auth-links {
+    justify-content: center;
+  }
+
+  .container {
+    padding: 20px;
+  }
+
+  .button-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  button {
+    width: 100%;
+    margin: 5px 0;
+  }
+
+  #analysis {
+    padding: 15px;
+  }
+
+  .price-info {
+    padding: 12px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .hero h1 {
+    font-size: 20px;
+  }
+
+  .auth-links a {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .container {
+    padding: 15px;
+  }
+
+  input[type="text"] {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  .disclaimer {
+    font-size: 11px;
+    padding: 12px;
+  }
+
+  .footer p {
+    font-size: 12px;
+  }
 }
