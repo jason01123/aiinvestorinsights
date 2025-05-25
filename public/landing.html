@@ -1,32 +1,169 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>AI Investor Insights</title>
   <link rel="stylesheet" href="style.css">
   <style>
     body {
-      text-align: center;
-      padding: 4rem;
-      font-family: sans-serif;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f7f9;
+      color: #333;
     }
-    .cta-button {
-      display: inline-block;
-      margin-top: 2rem;
-      padding: 1rem 2rem;
-      background-color: #4CAF50;
+
+    header {
+      background: #1e2a38;
       color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    header h1 {
+      color: white;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      font-size: 1.2rem;
+    }
+
+    .cta {
+      text-align: center;
+      margin: 2rem 0;
+      margin-top: 3rem;
+    }
+
+    .cta a {
+      background: #e64a19;
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 8px;
       text-decoration: none;
       font-size: 1.2rem;
-      border-radius: 5px;
+      transition: background 0.3s;
     }
-    .cta-button:hover {
-      background-color: #45a049;
+
+    .cta a:hover {
+      background: #ff7043;
+    }
+
+    .section {
+      padding: 2rem 1rem;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .steps {
+      display: flex;
+      justify-content: space-around;
+      text-align: center;
+      flex-wrap: wrap;
+    }
+
+    .step {
+      width: 250px;
+      margin: 1rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      padding: 1.5rem;
+    }
+
+    .step h3 {
+      margin-top: 0.5rem;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .feature {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+
+    footer {
+      background: #1e2a38;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      margin-top: 3rem;
+    }
+
+    .disclaimer {
+      color: #888;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-top: 1rem;
     }
   </style>
 </head>
 <body>
-  <h1>Welcome to AI Investor Insights</h1>
-  <p>Use AI to analyze the latest financial filings and get insights instantly.</p>
-  <a href="/app" class="cta-button">Get Started</a>
+
+  <header>
+    <h1>AI Investor Insights</h1>
+    <p>AI-powered financial summaries based on SEC filings</p>
+  </header>
+
+  <section class="cta">
+    <a href="/app">Sign up / Sign in</a>
+  </section>
+
+  <section class="section">
+    <h2 style="text-align:center;">How It Works</h2>
+    <div class="steps">
+      <div class="step">
+        <h3>1. Enter a Stock Symbol</h3>
+        <p>Search by ticker like AAPL or TSLA.</p>
+      </div>
+      <div class="step">
+        <h3>2. Fetch the 10-Q</h3>
+        <p>We retrieve the latest quarterly SEC filing automatically.</p>
+      </div>
+      <div class="step">
+        <h3>3. Get AI Analysis</h3>
+        <p>Receive a concise summary with a buy/sell/hold suggestion.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 style="text-align:center;">Why Use Us?</h2>
+    <div class="features">
+      <div class="feature">
+        <strong>✅ AI-Powered</strong>
+        <p>Built on OpenAI's latest models for real insight.</p>
+      </div>
+      <div class="feature">
+        <strong>📈 SEC-Based</strong>
+        <p>We use actual 10-Q filings from EDGAR — no fluff.</p>
+      </div>
+      <div class="feature">
+        <strong>💡 Simple Interface</strong>
+        <p>Just enter a ticker and click. That’s it.</p>
+      </div>
+      <div class="feature">
+        <strong>⚡ Fast Results</strong>
+        <p>Most analyses take just seconds to generate.</p>
+      </div>
+      <div class="feature">
+        <strong>📊 Compare Prices</strong>
+        <p>We show how the stock has moved since the filing date.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 AI Investor Insights. All rights reserved.</p>
+    <p><a href="#" style="color:#ddd;">Privacy Policy</a> | <a href="#" style="color:#ddd;">Terms of Service</a></p>
+  </footer>
+
 </body>
 </html>

@@ -1,48 +1,198 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>BUY / SELL / HOLD</title>
+  <meta charset="UTF-8">
+  <title>AI Investor Insights – Analyze a Stock</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f7f9;
+      color: #333;
+    }
+
+    header {
+      background: #1e2a38;
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      color: white;
+      font-size: 2.2rem;
+    }
+
+    .auth-links {
+      position: absolute;
+      top: 1.5rem;
+      right: 2rem;
+    }
+
+    .auth-links a {
+      color: white;
+      margin-left: 1rem;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .auth-links a:hover {
+      text-decoration: underline;
+    }
+
+    .main-content {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      min-height: 500px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #1e2a38;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    input[type="text"] {
+      padding: 0.8rem;
+      font-size: 1rem;
+      width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: center;
+    }
+
+    .button-group button {
+      background: #e64a19;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .button-group button:hover {
+      background: #ff7043;
+    }
+
+    #result, #analysis, .price-info {
+      margin-top: 2rem;
+      text-align: center;
+    }
+
+    .price-info p {
+      margin: 0.5rem 0;
+    }
+
+    .price-change {
+      font-weight: bold;
+    }
+
+    .price-up {
+      color: green;
+    }
+
+    .price-down {
+      color: red;
+    }
+
+    .disclaimer {
+      color: #888;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid #eee;
+    }
+
+    footer {
+      background: #1e2a38;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      margin-top: 3rem;
+    }
+
+    footer a {
+      color: #ddd;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      .input-group, input[type="text"] {
+        width: 100%;
+      }
+
+      .main-content {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+
+      .auth-links {
+        position: static;
+        text-align: center;
+        margin-top: 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="hero">
-    <div class="hero-content">
-      <h1>AI Investor Insights</h1>
-      <div class="auth-links">
-        <a href="#">Login</a>
-        <a href="#">Sign Up</a>
+
+  <header>
+    <h1>AI Investor Insights</h1>
+  </header>
+
+  <div class="main-content">
+    <h2>BUY / SELL / HOLD</h2>
+    <p style="text-align:center; margin-bottom: 20px;">AI analysis of the latest quarterly filing</p>
+
+    <div class="input-group">
+      <input type="text" id="symbol" placeholder="Enter stock symbol (e.g., AAPL)" required>
+      <div class="button-group">
+        <button onclick="fetchAndAnalyze()" id="analyzeBtn">Analyze Financials</button>
       </div>
     </div>
-  </div>
-  
-  <div class="main-content">
-    <div class="container">
-      <h1>BUY / SELL / HOLD</h1>
-      <h2>AI analysis of latest quarterly filing</h2>
-      <div class="input-group">
-        <input type="text" id="symbol" placeholder="Enter stock symbol (e.g., AAPL)" required>
-        <div class="button-group">
-          <button onclick="fetchAndAnalyze()" id="analyzeBtn">Analyze Financials</button>
-        </div>
-      </div>
-      <div id="result"></div>
-      <div id="priceInfo" class="price-info" style="display: none;"></div>
-      <div id="analysis"></div>
-      <div class="disclaimer">
-        The information provided on this page is generated using AI and is intended for informational purposes only. It does not constitute financial advice.
-      </div>
+
+    <div id="result"></div>
+    <div id="priceInfo" class="price-info" style="display: none;"></div>
+    <div id="analysis"></div>
+
+    <div class="disclaimer">
+      The information provided is generated using AI and is intended for informational purposes only. It does not constitute financial advice.
     </div>
   </div>
 
-  <footer class="footer">
-    <div class="footer-content">
-      <p>© 2025 AI Investor Insights. All rights reserved.</p>
-      <p>
-        <a href="#">Privacy Policy</a> | 
-        <a href="#">Terms of Service</a> | 
-        <a href="#">Contact Us</a>
-      </p>
-    </div>
+  <footer>
+    <p>© 2025 AI Investor Insights. All rights reserved.</p>
+    <p>
+      <a href="#">Privacy Policy</a> | 
+      <a href="#">Terms of Service</a> | 
+      <a href="#">Contact Us</a>
+    </p>
   </footer>
 
   <script>
@@ -65,7 +215,6 @@
       analyzeBtn.disabled = true;
 
       try {
-        // Step 1: Fetch latest 10-Q + price info
         const fetchResponse = await fetch('/fetch', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -95,7 +244,6 @@
           priceInfoDiv.style.display = 'block';
         }
 
-        // Step 2: Analyze
         analysisDiv.innerHTML = 'Analyzing financial data...';
 
         const analyzeResponse = await fetch('/analyze', {
@@ -127,5 +275,6 @@
       resultDiv.className = type;
     }
   </script>
+
 </body>
 </html>
