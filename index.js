@@ -183,6 +183,7 @@ app.post('/fetch', async (req, res) => {
 });
 
 // Analyze financials
+// Analyze financials
 app.post('/analyze', async (req, res) => {
   if (!req.body || !req.body.symbol) {
     return res.status(400).json({ error: 'Stock symbol is required' });
@@ -191,7 +192,7 @@ app.post('/analyze', async (req, res) => {
   const symbol = req.body.symbol.toUpperCase();
 
   db.get(
-    'SELECT content FROM financials WHERE symbol = ? ORDER BY created_at DESC LIMIT 1',
+    'SELECT id, content FROM financials WHERE symbol = ? ORDER BY created_at DESC LIMIT 1',
     [symbol],
     async (err, row) => {
       if (err) {
@@ -203,7 +204,6 @@ app.post('/analyze', async (req, res) => {
 
       try {
         const $ = cheerio.load(row.content);
-
         let content = '';
         $('p').each((_, el) => content += $(el).text() + '\n');
         $('table').each((_, el) => content += $(el).text() + '\n');
@@ -227,6 +227,16 @@ app.post('/analyze', async (req, res) => {
         });
 
         const analysis = completion.choices[0].message.content;
+
+        // Delete the entry from the database after analysis
+        db.run('DELETE FROM financials WHERE id = ?', [row.id], (deleteErr) => {
+          if (deleteErr) {
+            console.error('Error deleting entry:', deleteErr);
+          } else {
+            console.log(`Deleted entry for ${symbol} with ID ${row.id}`);
+          }
+        });
+
         res.json({ success: true, symbol, analysis });
 
       } catch (openaiError) {
@@ -239,6 +249,7 @@ app.post('/analyze', async (req, res) => {
     }
   );
 });
+
 
 // Error handling
 app.use((err, req, res, next) => {
