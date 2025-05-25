@@ -60,7 +60,6 @@ loadCachedTickers().catch(console.error);
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
@@ -84,9 +83,17 @@ const db = new sqlite3.Database('financials.db', (err) => {
 });
 
 // Routes
+// Serve landing page
 app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'landing.html'));
+});
+
+// Serve main app
+app.get('/app', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Fetch 10-Q + Stock Prices
 app.post('/fetch', async (req, res) => {
