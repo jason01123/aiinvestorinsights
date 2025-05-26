@@ -5,6 +5,9 @@ const path = require('path');
 const OpenAI = require('openai');
 const fs = require('fs');
 const cheerio = require('cheerio');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 const app = express();
@@ -90,6 +93,9 @@ app.get('/', (req, res) => {
 
 // Serve main app
 app.get('/app', (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect('/');
+  }
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
@@ -257,6 +263,87 @@ app.post('/analyze', async (req, res) => {
   );
 });
 
+app.use(require('express-session')({
+  secret: process.env.SESSION_SECRET || 'your_secret_key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false }
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    db.get('SELECT * FROM users WHERE username = ?', [username], async (err, user) => {
+      if (err) return done(err);
+      if (!user) return done(null, false, { message: 'Incorrect username.' });
+      const match = await bcrypt.compare(password, user.password);
+      if (!match) return done(null, false, { message: 'Incorrect password.' });
+      return done(null, user);
+    });
+  }
+));
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+  db.get('SELECT * FROM users WHERE id = ?', [id], (err, user) => {
+    done(err, user);
+  });
+});
+
+app.post('/signup', async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], function (err) {
+      if (err) return res.status(400).json({ error: 'Username already taken' });
+      req.login({ id: this.lastID, username }, (err) => {
+        if (err) return res.status(500).json({ error: 'Login after signup failed' });
+        res.json({ success: true });
+      });
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Signup failed' });
+  }
+});
+
+app.post('/login', passport.authenticate('local'), (req, res) => {
+  res.json({ success: true });
+});
+
+app.post('/logout', (req, res) => {
+  req.logout(() => {
+    res.json({ success: true });
+  });
+});
+
+function requireLogin(req, res, next) {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ error: 'You must be logged in.' });
+  }
+  next();
+}
+
+app.get('/me', (req, res) => {
+  if (req.isAuthenticated()) {
+    res.json({ user: req.user });
+  } else {
+    res.status(401).json({ error: 'Not authenticated' });
+  }
+});
+
+// Serve login and signup pages
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+app.get('/signup', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'signup.html'));
+});
 
 // Error handling
 app.use((err, req, res, next) => {
