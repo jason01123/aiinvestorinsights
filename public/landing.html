@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>AI Investor Insights</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
     body {
       margin: 0;
@@ -31,7 +32,7 @@
 
     .cta {
       text-align: center;
-      margin: 3rem 0 2rem;
+      margin: 0.75rem 0 0.5rem;
     }
 
     .cta a {
@@ -82,10 +83,31 @@
     }
 
     .feature {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
       background: white;
       padding: 1rem;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+
+    .feature i {
+      color: #e64a19;
+      font-size: 2rem;
+      margin-right: 1rem;
+      display: flex;
+      width: 2.5rem;
+      min-width: 2.5rem;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .feature strong {
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+      font-size: 1.1rem;
     }
 
     .thumbnails {
@@ -155,9 +177,9 @@
 
   <header>
     <h1>AI Investor Insights</h1>
-    <p>AI-powered financial summaries based on SEC filings</p>
+    <p>AI-powered financial analysis based on SEC filings</p>
     <div class="auth-links">
-      <a href="/login">Login</a>
+      <a href="/login">Login</a>    
       <a href="/signup">Sign Up</a>
     </div>
   </header>
@@ -183,6 +205,46 @@
       </div>
     </div>
   </section>
+  <section class="section">
+    <h2 style="text-align:center;">Why Use Us?</h2>
+    <div class="features">
+      <div class="feature">
+        <i class="fas fa-brain"></i>
+        <div>
+          <strong>AI-Powered</strong>
+          <p>Built on OpenAI's latest models for real insight.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <i class="fas fa-chart-line"></i>
+        <div>
+          <strong>SEC-Based</strong>
+          <p>We use actual 10-Q filings from EDGAR — no fluff.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <i class="fas fa-lightbulb"></i>
+        <div>
+          <strong>Simple Interface</strong>
+          <p>Just enter a ticker and click. That's it.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <i class="fas fa-bolt"></i>
+        <div>
+          <strong>Fast Results</strong>
+          <p>Most analyses take just seconds to generate.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <i class="fas fa-chart-bar"></i>
+        <div>
+          <strong>Compare Prices</strong>
+          <p>We show how the stock has moved since the filing date.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <section class="section">
     <h2 style="text-align:center;">Recent Analyses</h2>
@@ -200,31 +262,7 @@
     </div>
   </section>
 
-  <section class="section">
-    <h2 style="text-align:center;">Why Use Us?</h2>
-    <div class="features">
-      <div class="feature">
-        <strong>✅ AI-Powered</strong>
-        <p>Built on OpenAI's latest models for real insight.</p>
-      </div>
-      <div class="feature">
-        <strong>📈 SEC-Based</strong>
-        <p>We use actual 10-Q filings from EDGAR — no fluff.</p>
-      </div>
-      <div class="feature">
-        <strong>💡 Simple Interface</strong>
-        <p>Just enter a ticker and click. That's it.</p>
-      </div>
-      <div class="feature">
-        <strong>⚡ Fast Results</strong>
-        <p>Most analyses take just seconds to generate.</p>
-      </div>
-      <div class="feature">
-        <strong>📊 Compare Prices</strong>
-        <p>We show how the stock has moved since the filing date.</p>
-      </div>
-    </div>
-  </section>
+
 
   <footer>
     <p>&copy; 2025 AI Investor Insights. All rights reserved.</p>
