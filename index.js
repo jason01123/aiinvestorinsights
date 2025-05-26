@@ -64,6 +64,16 @@ loadCachedTickers().catch(console.error);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Session and Passport middleware must come BEFORE routes
+app.use(require('express-session')({
+  secret: process.env.SESSION_SECRET || 'your_secret_key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false }
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
   next();
@@ -80,6 +90,12 @@ const db = new sqlite3.Database('financials.db', (err) => {
       symbol TEXT NOT NULL,
       date TEXT NOT NULL,
       content TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+    db.run(`CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
   }
@@ -263,15 +279,6 @@ app.post('/analyze', async (req, res) => {
   );
 });
 
-app.use(require('express-session')({
-  secret: process.env.SESSION_SECRET || 'your_secret_key',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false }
-}));
-app.use(passport.initialize());
-app.use(passport.session());
-
 passport.use(new LocalStrategy(
   function(username, password, done) {
     db.get('SELECT * FROM users WHERE username = ?', [username], async (err, user) => {
@@ -301,7 +308,13 @@ app.post('/signup', async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], function (err) {
-      if (err) return res.status(400).json({ error: 'Username already taken' });
+      if (err) {
+        console.error('Signup error:', err);
+        if (err.message && err.message.includes('UNIQUE constraint failed')) {
+          return res.status(400).json({ error: 'Username already taken' });
+        }
+        return res.status(500).json({ error: 'Database error: ' + err.message });
+      }
       req.login({ id: this.lastID, username }, (err) => {
         if (err) return res.status(500).json({ error: 'Login after signup failed' });
         res.json({ success: true });
